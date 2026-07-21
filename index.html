@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📚 Slotex</title>
+
+    <style>
+        /* ============================================================
+           CSS VARIABLES & RESET
+           ============================================================ */
+        :root {
+            --bg-primary: #f0f4ff;
+            --bg-secondary: rgba(255, 255, 255, 0.70);
+            --bg-card: rgba(255, 255, 255, 0.55);
+            --bg-glass: rgba(255, 255, 255, 0.30);
+            --bg-glass-strong: rgba(255, 255, 255, 0.50);
+            --border-glass: rgba(255, 255, 255, 0.35);
+            --shadow-glass: 0 20px 60px rgba(0, 20, 50, 0.10);
+            --shadow-card: 0 8px 32px rgba(0, 20, 50, 0.08);
+            --shadow-modal: 0 40px 120px rgba(0, 0, 0, 0.25);
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a6a;
+            --text-muted: #7a7a9a;
+            --accent-1: #6c5ce7;
+            --accent-2: #00b894;
+            --accent-3: #fdcb6e;
+            --accent-4: #e17055;
+            --gradient-main: linear-gradient(135deg, #6c5ce7, #00b894);
+            --high-prod: #00b894;
+            --med-prod: #fdcb6e;
+            --low-prod: #e17055;
+            --radius-sm: 10px;
+            --radius-md: 18px;
+            --radius-lg: 28px;
+            --transition: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --modal-overlay: rgba(0, 0, 0, 0.35);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0b0a16;
+            --bg-secondary: rgba(30, 28, 58, 0.80);
+            --bg-card: rgba(40, 38, 70, 0.65);
+            --bg-glass: rgba(50, 48, 80, 0.45);
+            --bg-glass-strong: rgba(60, 58, 90, 0.60);
+            --border-glass: rgba(255, 255, 255, 0.07);
+            --shadow-glass: 0 20px 60px rgba(0, 0, 0, 0.55);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.30);
+            --shadow-modal: 0 40px 120px rgba(0, 0, 0, 0.60);
+            --text-primary: #e8e6f0;
+            --text-secondary: #b8b6d0;
+            --text-muted: #8886a8;
+            --gradient-main: linear-gradient(135deg, #8b7cf7, #00d2a0);
+            --modal-overlay: rgba(0, 0, 0, 0.65);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px 20px 100px;
+            transition: background var(--transition), color var(--transition);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.40;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.04);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-1);
+            border-radius: 10px;
+        }
+        [data-theme="dark"] ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-glass);
+        }
+
+        .card-glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px) saturate(1.2);
+            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-card);
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+
+        .card-glass:hover {
+            box-shadow: var(--shadow-glass);
+            transform: translateY(-3px);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: var(--font);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            background: var(--gradient-main);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(108, 92, 231, 0.30);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.15);
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+        .btn:hover::after {
+            opacity: 1;
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-card);
+        }
+        .btn-secondary:hover {
+            box-shadow: var(--shadow-glass);
+            background: rgba(255, 255, 255, 0.85);
+        }
+        [data-theme="dark"] .btn-secondary {
+            background: rgba(50, 48, 80, 0.60);
+            color: var(--text-primary);
+        }
+        [data-theme="dark"] .btn-secondary:hover {
+            background: rgba(70, 68, 100, 0.75);
+        }
+
+        .btn-danger {
+            background: var(--accent-4);
+            box-shadow: 0 4px 16px rgba(225, 112, 85, 0.30);
+        }
+        .btn-success {
+            background: var(--accent-2);
+            box-shadow: 0 4px 16px rgba(0, 184, 148, 0.30);
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.8rem;
+        }
+        .btn-icon {
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 1.1rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 14px;
+            border-radius: 100px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-glass);
+            transition: all var(--transition);
+        }
+
+        .badge-high {
+            background: rgba(0, 184, 148, 0.18);
+            color: var(--high-prod);
+        }
+        .badge-med {
+            background: rgba(253, 203, 110, 0.20);
+            color: #c9a02e;
+        }
+        .badge-low {
+            background: rgba(225, 112, 85, 0.18);
+            color: var(--low-prod);
+        }
+
+        .badge-subject {
+            padding: 2px 12px;
+            border-radius: 100px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-now {
+            background: rgba(0, 184, 148, 0.20);
+            color: var(--high-prod);
+            animation: pulse-badge 2s infinite;
+        }
+
+        @keyframes pulse-badge {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.6;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease both;
+        }
+        .slide-up {
+            animation: slideUp 0.4s ease both;
+        }
+
+        /* ============================================================
+           HEADER
+           ============================================================ */
+        .app-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 28px;
+            margin-bottom: 28px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-glass);
+            transition: all var(--transition);
+        }
+
+        .app-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-header .brand h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .app-header .brand .subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            -webkit-text-fill-color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .theme-toggle {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-glass);
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            color: var(--text-primary);
+        }
+        .theme-toggle:hover {
+            transform: rotate(25deg) scale(1.06);
+            box-shadow: var(--shadow-card);
+        }
+
+        /* ============================================================
+           DASHBOARD STATS
+           ============================================================ */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            padding: 14px 16px;
+            text-align: center;
+            background: var(--bg-card);
+            backdrop-filter: blur(12px) saturate(1.2);
+            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-card);
+            transition: all var(--transition);
+            cursor: default;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-glass);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 1.4rem;
+            margin-bottom: 2px;
+        }
+        .stat-card .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all var(--transition);
+        }
+        .stat-card .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ============================================================
+           FILTER & SEARCH
+           ============================================================ */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 14px 18px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-glass);
+            align-items: center;
+        }
+
+        .filter-bar .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 6px 12px;
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-sm);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: var(--font);
+            font-size: 0.82rem;
+            outline: none;
+            transition: all var(--transition);
+            min-width: 100px;
+        }
+
+        .filter-bar input:focus,
+        .filter-bar select:focus {
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.10);
+        }
+
+        .filter-bar .filter-clear {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition);
+        }
+        .filter-bar .filter-clear:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* ============================================================
+           TIMELINE
+           ============================================================ */
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .timeline-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .timeline-item {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px) saturate(1.2);
+            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-card);
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.4s ease both;
+        }
+
+        .timeline-item:hover {
+            box-shadow: var(--shadow-glass);
+            transform: translateX(4px);
+        }
+
+        .timeline-item.active-slot {
+            border-left: 4px solid var(--accent-2);
+            background: rgba(0, 184, 148, 0.06);
+            box-shadow: 0 0 0 1px rgba(0, 184, 148, 0.15), var(--shadow-card);
+        }
+
+        .timeline-item .slot-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .timeline-item .slot-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .timeline-item .slot-time {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timeline-item .slot-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 14px;
+            margin-top: 4px;
+        }
+
+        .timeline-item .slot-notes {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            padding: 10px 14px;
+            background: var(--bg-glass);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--accent-1);
+        }
+
+        .slot-progress {
+            height: 4px;
+            border-radius: 10px;
+            background: var(--bg-secondary);
+            margin: 10px 0 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slot-progress .slot-progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: var(--gradient-main);
+            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            width: 0%;
+        }
+
+        /* ----- Tasks ----- */
+        .task-list {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            background: var(--bg-glass);
+            border-radius: var(--radius-sm);
+            transition: all var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .task-item:hover {
+            border-color: var(--border-glass);
+            background: var(--bg-glass-strong);
+        }
+
+        .task-item.completed .task-name {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .task-item .task-check {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-2);
+            cursor: pointer;
+            flex-shrink: 0;
+            border-radius: 4px;
+            transition: all var(--transition);
+        }
+
+        .task-item .task-check:hover {
+            transform: scale(1.1);
+        }
+
+        .task-item .task-name {
+            flex: 1;
+            font-size: 0.85rem;
+        }
+
+        .task-item .task-priority {
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 100px;
+            background: var(--bg-secondary);
+            color: var(--text-muted);
+        }
+
+        .task-item .task-actions {
+            display: flex;
+            gap: 2px;
+        }
+
+        .task-item .task-actions button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: all var(--transition);
+        }
+        .task-item .task-actions button:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .add-task-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .add-task-form input {
+            flex: 1;
+            padding: 8px 14px;
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-sm);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: var(--font);
+            font-size: 0.85rem;
+            outline: none;
+            min-width: 120px;
+            transition: all var(--transition);
+        }
+
+        .add-task-form input:focus {
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.12);
+        }
+
+        /* ============================================================
+           MODAL
+           ============================================================ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: var(--modal-overlay);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease both;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            max-width: 720px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 32px 36px;
+            box-shadow: var(--shadow-modal);
+            border: 1px solid var(--border-glass);
+            animation: slideDown 0.35s ease both;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-close {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-glass);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .modal-close:hover {
+            background: var(--bg-card);
+            transform: rotate(90deg);
+            color: var(--text-primary);
+        }
+
+        .modal .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px 20px;
+        }
+
+        .modal .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .modal .form-group label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.02em;
+        }
+
+        .modal .form-group input,
+        .modal .form-group select,
+        .modal .form-group textarea {
+            padding: 10px 14px;
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-sm);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: var(--font);
+            font-size: 0.9rem;
+            transition: all var(--transition);
+            outline: none;
+            width: 100%;
+        }
+
+        .modal .form-group input:focus,
+        .modal .form-group select:focus,
+        .modal .form-group textarea:focus {
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.12);
+        }
+
+        .modal .form-group textarea {
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        .modal .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* ============================================================
+           FLOATING CREATE BUTTON
+           ============================================================ */
+        .fab-create {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-main);
+            color: #fff;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(108, 92, 231, 0.40);
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fab-create:hover {
+            transform: scale(1.08) rotate(90deg);
+            box-shadow: 0 12px 48px rgba(108, 92, 231, 0.50);
+        }
+
+        .fab-create:active {
+            transform: scale(0.92);
+        }
+
+        /* ============================================================
+           NOTIFICATIONS
+           ============================================================ */
+        .notification-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 380px;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .notification-toast {
+            pointer-events: auto;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-modal);
+            animation: slideIn 0.4s ease both;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification-toast .notif-icon {
+            font-size: 1.3rem;
+        }
+        .notification-toast .notif-body {
+            flex: 1;
+        }
+        .notification-toast .notif-body .notif-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .notification-toast .notif-body .notif-desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+        .notification-toast .notif-close {
+            background: transparent;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0 4px;
+            transition: all var(--transition);
+        }
+        .notification-toast .notif-close:hover {
+            color: var(--text-primary);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px) scale(0.94);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        /* ============================================================
+           SAVE INDICATOR
+           ============================================================ */
+        .save-indicator {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            padding: 6px 16px;
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border-radius: 100px;
+            border: 1px solid var(--border-glass);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-card);
+            z-index: 100;
+            transition: all var(--transition);
+            opacity: 0.7;
+        }
+
+        .save-indicator:hover {
+            opacity: 1;
+        }
+
+        .save-indicator .save-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-2);
+            transition: all var(--transition);
+        }
+
+        .save-indicator.saving .save-dot {
+            animation: pulse-dot 0.8s infinite;
+            background: var(--accent-1);
+        }
+
+        /* ============================================================
+           EMPTY STATE
+           ============================================================ */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        .empty-state h3 {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px 12px 90px;
+            }
+            .app-header {
+                padding: 14px 18px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                border-radius: var(--radius-md);
+            }
+            .app-header .brand h1 {
+                font-size: 1.2rem;
+            }
+            .app-header .brand .subtitle {
+                font-size: 0.7rem;
+            }
+            .header-actions {
+                justify-content: flex-start;
+            }
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .stat-card .stat-value {
+                font-size: 1.2rem;
+            }
+            .stat-card .stat-icon {
+                font-size: 1.1rem;
+            }
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 12px 14px;
+            }
+            .filter-bar .filter-group {
+                flex-wrap: wrap;
+            }
+            .filter-bar input,
+            .filter-bar select {
+                min-width: 80px;
+                flex: 1;
+            }
+            .modal {
+                padding: 24px 20px;
+                margin: 10px;
+                border-radius: var(--radius-md);
+            }
+            .modal .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .timeline-item {
+                padding: 14px 16px;
+            }
+            .timeline-item .slot-title {
+                font-size: 1rem;
+            }
+            .fab-create {
+                bottom: 20px;
+                right: 20px;
+                width: 54px;
+                height: 54px;
+                font-size: 1.6rem;
+            }
+            .save-indicator {
+                bottom: 85px;
+                right: 20px;
+                padding: 4px 14px;
+                font-size: 0.65rem;
+            }
+            .notification-container {
+                left: 12px;
+                right: 12px;
+                max-width: 100%;
+                top: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .stat-card {
+                padding: 10px 12px;
+            }
+            .stat-card .stat-value {
+                font-size: 1rem;
+            }
+            .stat-card .stat-label {
+                font-size: 0.6rem;
+            }
+            .modal {
+                padding: 18px 14px;
+            }
+            .modal-header h2 {
+                font-size: 1.1rem;
+            }
+            .timeline-item {
+                padding: 12px 14px;
+            }
+            .task-item {
+                padding: 4px 8px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== PARTICLES CANVAS ===== -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- ===== NOTIFICATION CONTAINER ===== -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- ===== MODAL ===== -->
+    <div id="slot-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">✏️ Create Study Slot</h2>
+                <button class="modal-close" id="modal-close" aria-label="Close modal">✕</button>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="slotName">Slot Name</label>
+                    <input type="text" id="slotName" placeholder="e.g. Morning Deep Work" />
+                </div>
+                <div class="form-group">
+                    <label for="slotStart">Start Time</label>
+                    <input type="time" id="slotStart" value="08:00" />
+                </div>
+                <div class="form-group">
+                    <label for="slotEnd">End Time</label>
+                    <input type="time" id="slotEnd" value="10:00" />
+                </div>
+                <div class="form-group">
+                    <label for="slotProductivity">Productivity Level</label>
+                    <select id="slotProductivity">
+                        <option value="high">🟢 Highly Productive</option>
+                        <option value="medium" selected>🟡 Medium Productive</option>
+                        <option value="low">🔴 Low Productivity</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="slotSubject">Subject</label>
+                    <select id="slotSubject">
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Biology">Biology</option>
+                        <option value="Coding">Coding</option>
+                        <option value="English">English</option>
+                        <option value="Custom">✨ Custom Subject</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="slotCustomSubject">Custom Subject</label>
+                    <input type="text" id="slotCustomSubject" placeholder="e.g. History" />
+                </div>
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label for="slotNotes">Notes <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
+                    <textarea id="slotNotes" placeholder="Any notes for this slot..." rows="2"></textarea>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn" id="createSlotBtn">➕ Create Slot</button>
+                <button class="btn btn-secondary" id="clearFormBtn">Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SAVE INDICATOR ===== -->
+    <div id="save-indicator" class="save-indicator">
+        <span class="save-dot"></span>
+        <span id="save-text">All saved</span>
+    </div>
+
+    <!-- ===== FLOATING CREATE BUTTON ===== -->
+    <button class="fab-create" id="fabCreate" aria-label="Create new slot">＋</button>
+
+    <!-- ============================================================
+    MAIN APP
+    ============================================================ -->
+    <div class="container">
+
+        <!-- ===== HEADER ===== -->
+        <header class="app-header" role="banner">
+            <div class="brand">
+                <div>
+                    <h1>📚 Study Slot Planner</h1>
+                    <div class="subtitle">Plan your day according to your focus.</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+                <button class="btn btn-secondary btn-sm" id="exportJsonBtn" aria-label="Export data">📤 Export</button>
+                <button class="btn btn-secondary btn-sm" id="importJsonBtn" aria-label="Import data">📥 Import</button>
+                <input type="file" id="importFileInput" accept=".json" style="display:none;" />
+            </div>
+        </header>
+
+        <!-- ===== DASHBOARD ===== -->
+        <section class="dashboard" id="dashboard" aria-label="Statistics dashboard">
+            <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-value" id="stat-today-slots">0</div><div class="stat-label">Today's Slots</div></div>
+            <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="stat-completed-tasks">0</div><div class="stat-label">Completed Tasks</div></div>
+            <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-value" id="stat-remaining-tasks">0</div><div class="stat-label">Remaining Tasks</div></div>
+            <div class="stat-card"><div class="stat-icon">⏱️</div><div class="stat-value" id="stat-total-hours">0h</div><div class="stat-label">Total Study Time</div></div>
+            <div class="stat-card"><div class="stat-icon">🎯</div><div class="stat-value" id="stat-focus-score">0%</div><div class="stat-label">Focus Score</div></div>
+        </section>
+
+        <!-- ===== FILTER BAR ===== -->
+        <div class="filter-bar" id="filterBar">
+            <div class="filter-group">
+                <label for="filterSearch">🔍</label>
+                <input type="text" id="filterSearch" placeholder="Search slots..." />
+            </div>
+            <div class="filter-group">
+                <label for="filterSubject">Subject</label>
+                <select id="filterSubject">
+                    <option value="all">All</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Coding">Coding</option>
+                    <option value="English">English</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterProductivity">Focus</label>
+                <select id="filterProductivity">
+                    <option value="all">All</option>
+                    <option value="high">🟢 High</option>
+                    <option value="medium">🟡 Medium</option>
+                    <option value="low">🔴 Low</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterStatus">Status</label>
+                <select id="filterStatus">
+                    <option value="all">All</option>
+                    <option value="completed">✅ Completed</option>
+                    <option value="incomplete">⏳ Incomplete</option>
+                </select>
+            </div>
+            <button class="filter-clear" id="filterClear">✕ Clear</button>
+        </div>
+
+        <!-- ===== TIMELINE ===== -->
+        <div class="timeline-header">
+            <h2>📋 Your Study Slots</h2>
+            <span style="font-size:0.8rem;color:var(--text-muted);" id="slot-count">0 slots</span>
+        </div>
+        <div id="timelineContainer" class="timeline">
+            <!-- Rendered by JS -->
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+    SCRIPT.JS
+    ============================================================ -->
+    <script>
+        /* ============================================================
+           SCRIPT.JS — Study Slot Planner (Core)
+           No streaks, achievements, calendar, statistics, or timers.
+           ============================================================ */
+
+        'use strict';
+
+        // ============================================================
+        // 1. STATE
+        // ============================================================
+        const STATE = {
+            slots: [],
+            theme: 'light',
+            editingSlotId: null,
+        };
+
+        // ============================================================
+        // 2. DOM REFS
+        // ============================================================
+        const $ = (sel) => document.querySelector(sel);
+        const $$ = (sel) => document.querySelectorAll(sel);
+
+        const DOM = {
+            themeToggle: $('#themeToggle'),
+            slotName: $('#slotName'),
+            slotStart: $('#slotStart'),
+            slotEnd: $('#slotEnd'),
+            slotProductivity: $('#slotProductivity'),
+            slotSubject: $('#slotSubject'),
+            slotCustomSubject: $('#slotCustomSubject'),
+            slotNotes: $('#slotNotes'),
+            createSlotBtn: $('#createSlotBtn'),
+            clearFormBtn: $('#clearFormBtn'),
+            timelineContainer: $('#timelineContainer'),
+            notificationContainer: $('#notification-container'),
+            saveIndicator: $('#save-indicator'),
+            saveText: $('#save-text'),
+            exportJsonBtn: $('#exportJsonBtn'),
+            importJsonBtn: $('#importJsonBtn'),
+            importFileInput: $('#importFileInput'),
+            fabCreate: $('#fabCreate'),
+            modal: $('#slot-modal'),
+            modalClose: $('#modal-close'),
+            modalTitle: $('#modal-title'),
+            slotCount: $('#slot-count'),
+            filterSearch: $('#filterSearch'),
+            filterSubject: $('#filterSubject'),
+            filterProductivity: $('#filterProductivity'),
+            filterStatus: $('#filterStatus'),
+            filterClear: $('#filterClear'),
+            // Stats
+            statTodaySlots: $('#stat-today-slots'),
+            statCompletedTasks: $('#stat-completed-tasks'),
+            statRemainingTasks: $('#stat-remaining-tasks'),
+            statTotalHours: $('#stat-total-hours'),
+            statFocusScore: $('#stat-focus-score'),
+        };
+
+        // ============================================================
+        // 3. UTILITY FUNCTIONS
+        // ============================================================
+        function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+        function timeToMinutes(t) { const [h, m] = t.split(':').map(Number); return h * 60 + m; }
+
+        function getToday() { return new Date().toISOString().slice(0, 10); }
+
+        function getSubjectColor(subject) {
+            const map = {
+                'Mathematics': '#6c5ce7',
+                'Physics': '#0984e3',
+                'Chemistry': '#00b894',
+                'Biology': '#00cec9',
+                'Coding': '#fd79a8',
+                'English': '#fdcb6e',
+            };
+            return map[subject] || '#8b8bae';
+        }
+
+        function getProductivityLabel(val) {
+            return val === 'high' ? '🟢 High' : val === 'medium' ? '🟡 Medium' : '🔴 Low';
+        }
+
+        function getProductivityBadge(val) {
+            return val === 'high' ? 'badge-high' : val === 'medium' ? 'badge-med' : 'badge-low';
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function debounce(fn, ms = 300) {
+            let timer;
+            return (...args) => { clearTimeout(timer);
+                timer = setTimeout(() => fn(...args), ms); };
+        }
+
+        function getCurrentSlot(slots) {
+            const now = new Date();
+            const today = getToday();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            return slots.find(s => {
+                if (s.date !== today) return false;
+                const start = timeToMinutes(s.startTime);
+                const end = timeToMinutes(s.endTime);
+                return currentMinutes >= start && currentMinutes < end;
+            }) || null;
+        }
+
+        function getFilteredSlots() {
+            const search = DOM.filterSearch.value.toLowerCase().trim();
+            const subject = DOM.filterSubject.value;
+            const productivity = DOM.filterProductivity.value;
+            const status = DOM.filterStatus.value;
+
+            return STATE.slots.filter(slot => {
+                // Search
+                if (search && !slot.name.toLowerCase().includes(search) && !slot.subject.toLowerCase().includes(search)) {
+                    return false;
+                }
+                // Subject
+                if (subject !== 'all' && slot.subject !== subject) return false;
+                // Productivity
+                if (productivity !== 'all' && slot.productivity !== productivity) return false;
+                // Status
+                if (status === 'completed') {
+                    const tasks = slot.tasks || [];
+                    if (tasks.length === 0) return false;
+                    if (!tasks.every(t => t.completed)) return false;
+                }
+                if (status === 'incomplete') {
+                    const tasks = slot.tasks || [];
+                    if (tasks.length === 0) return true;
+                    if (tasks.every(t => t.completed)) return false;
+                }
+                return true;
+            });
+        }
+
+        // ============================================================
+        // 4. NOTIFICATIONS
+        // ============================================================
+        function showNotification(title, desc, icon = '📢') {
+            const container = DOM.notificationContainer;
+            const toast = document.createElement('div');
+            toast.className = 'notification-toast fade-in';
+            toast.innerHTML = `
+                <span class="notif-icon">${icon}</span>
+                <div class="notif-body">
+                    <div class="notif-title">${escapeHtml(title)}</div>
+                    <div class="notif-desc">${escapeHtml(desc)}</div>
+                </div>
+                <button class="notif-close" aria-label="Dismiss">✕</button>
+            `;
+            toast.querySelector('.notif-close').addEventListener('click', () => toast.remove());
+            container.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
+
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, { body: desc, icon: '📚' });
+            }
+        }
+
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        // ============================================================
+        // 5. SLOT CRUD
+        // ============================================================
+        function createSlot(data) {
+            const slot = {
+                id: generateId(),
+                name: data.name || 'Untitled Slot',
+                date: data.date || getToday(),
+                startTime: data.startTime || '08:00',
+                endTime: data.endTime || '10:00',
+                productivity: data.productivity || 'medium',
+                subject: data.subject || 'General',
+                notes: data.notes || '',
+                tasks: data.tasks || [],
+                createdAt: new Date().toISOString(),
+            };
+            STATE.slots.push(slot);
+            saveData();
+            renderAll();
+            showNotification('✅ Slot Created', `${slot.name} (${slot.startTime} — ${slot.endTime})`, '📋');
+            closeModal();
+            return slot;
+        }
+
+        function editSlot(id, updates) {
+            const slot = STATE.slots.find(s => s.id === id);
+            if (!slot) return;
+            Object.assign(slot, updates);
+            saveData();
+            renderAll();
+            closeModal();
+            showNotification('✏️ Slot Updated', `${slot.name} has been updated.`, '✏️');
+        }
+
+        function deleteSlot(id) {
+            if (!confirm('Delete this slot and all its tasks?')) return;
+            const slot = STATE.slots.find(s => s.id === id);
+            STATE.slots = STATE.slots.filter(s => s.id !== id);
+            saveData();
+            renderAll();
+            showNotification('🗑️ Slot Deleted', slot ? `${slot.name} has been removed.` : 'Slot removed.', '🗑️');
+        }
+
+        function addTask(slotId, taskData) {
+            const slot = STATE.slots.find(s => s.id === slotId);
+            if (!slot) return;
+            const task = {
+                id: generateId(),
+                name: taskData.name || 'Task',
+                completed: taskData.completed || false,
+                priority: taskData.priority || 'medium',
+                notes: taskData.notes || '',
+                estimatedDuration: taskData.estimatedDuration || 0,
+                createdAt: new Date().toISOString(),
+            };
+            slot.tasks.push(task);
+            saveData();
+            renderAll();
+        }
+
+        function toggleTask(slotId, taskId) {
+            const slot = STATE.slots.find(s => s.id === slotId);
+            if (!slot) return;
+            const task = slot.tasks.find(t => t.id === taskId);
+            if (!task) return;
+            task.completed = !task.completed;
+            saveData();
+            renderAll();
+        }
+
+        function deleteTask(slotId, taskId) {
+            const slot = STATE.slots.find(s => s.id === slotId);
+            if (!slot) return;
+            slot.tasks = slot.tasks.filter(t => t.id !== taskId);
+            saveData();
+            renderAll();
+        }
+
+        function editTask(slotId, taskId, updates) {
+            const slot = STATE.slots.find(s => s.id === slotId);
+            if (!slot) return;
+            const task = slot.tasks.find(t => t.id === taskId);
+            if (!task) return;
+            Object.assign(task, updates);
+            saveData();
+            renderAll();
+        }
+
+        // ============================================================
+        // 6. STATISTICS (simple calculations)
+        // ============================================================
+        function calculateStats() {
+            const slots = STATE.slots;
+            const today = getToday();
+            const todaySlots = slots.filter(s => s.date === today);
+
+            let totalTasks = 0,
+                completedTasks = 0;
+            slots.forEach(s => s.tasks.forEach(t => { totalTasks++;
+                if (t.completed) completedTasks++; }));
+
+            let totalMinutes = 0;
+            slots.forEach(s => {
+                const start = timeToMinutes(s.startTime);
+                const end = timeToMinutes(s.endTime);
+                if (end > start) totalMinutes += (end - start);
+            });
+            const hours = totalMinutes / 60;
+
+            const focusScore = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+            return { todaySlots: todaySlots.length, completedTasks, remainingTasks: totalTasks - completedTasks,
+                totalHours: hours, focusScore };
+        }
+
+        // ============================================================
+        // 7. RENDER: DASHBOARD
+        // ============================================================
+        function updateDashboard() {
+            const stats = calculateStats();
+            DOM.statTodaySlots.textContent = stats.todaySlots;
+            DOM.statCompletedTasks.textContent = stats.completedTasks;
+            DOM.statRemainingTasks.textContent = stats.remainingTasks;
+            const h = stats.totalHours;
+            DOM.statTotalHours.textContent = h < 1 ? `${Math.round(h * 60)}m` : `${h.toFixed(1)}h`;
+            DOM.statFocusScore.textContent = `${stats.focusScore}%`;
+            DOM.slotCount.textContent = `${STATE.slots.length} slots`;
+        }
+
+        // ============================================================
+        // 8. RENDER: TIMELINE
+        // ============================================================
+        function renderTimeline() {
+            const container = DOM.timelineContainer;
+            const filtered = getFilteredSlots();
+
+            if (!filtered.length) {
+                const hasSlots = STATE.slots.length > 0;
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">${hasSlots ? '🔍' : '📋'}</div>
+                        <h3>${hasSlots ? 'No slots match your filters' : 'No slots yet'}</h3>
+                        <p>${hasSlots ? 'Try adjusting your search or filters.' : 'Click the ＋ button to create your first study slot.'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sorted = [...filtered].sort((a, b) => {
+                if (a.date !== b.date) return a.date.localeCompare(b.date);
+                return timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
+            });
+
+            const currentSlot = getCurrentSlot(STATE.slots);
+
+            container.innerHTML = sorted.map(slot => {
+                const isActive = currentSlot && currentSlot.id === slot.id;
+                const tasks = slot.tasks || [];
+                const completedTasks = tasks.filter(t => t.completed).length;
+                const progress = tasks.length ? Math.round((completedTasks / tasks.length) * 100) : 0;
+                const subjectColor = getSubjectColor(slot.subject);
+                const prodLabel = getProductivityLabel(slot.productivity);
+                const prodBadge = getProductivityBadge(slot.productivity);
+
+                return `
+                    <div class="timeline-item ${isActive ? 'active-slot' : ''}" data-slot-id="${slot.id}">
+                        <div class="slot-header">
+                            <div class="slot-title">
+                                <span>${escapeHtml(slot.name)}</span>
+                                <span class="badge ${prodBadge}">${prodLabel}</span>
+                                <span class="badge-subject" style="background:${subjectColor};">${escapeHtml(slot.subject)}</span>
+                                ${isActive ? '<span class="badge badge-now">▶ Now</span>' : ''}
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                <span class="slot-time">${slot.startTime} — ${slot.endTime}</span>
+                                <button class="btn btn-secondary btn-sm" data-edit-slot="${slot.id}" title="Edit">✏️</button>
+                                <button class="btn btn-danger btn-sm" data-delete-slot="${slot.id}" title="Delete">🗑️</button>
+                            </div>
+                        </div>
+
+                        <div class="slot-meta">
+                            <span>📊 Progress: ${progress}%</span>
+                            <span>✅ ${completedTasks}/${tasks.length} tasks</span>
+                            ${slot.notes ? `<span>📝 ${escapeHtml(slot.notes)}</span>` : ''}
+                        </div>
+
+                        <div class="slot-progress">
+                            <div class="slot-progress-fill" style="width:${progress}%;"></div>
+                        </div>
+
+                        <div class="task-list" data-slot-tasks="${slot.id}">
+                            ${tasks.map(task => `
+                                <div class="task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
+                                    <input type="checkbox" class="task-check" ${task.completed ? 'checked' : ''} data-toggle-task="${slot.id}|${task.id}" />
+                                    <span class="task-name">${escapeHtml(task.name)}</span>
+                                    <span class="task-priority">${task.priority || 'medium'}</span>
+                                    ${task.notes ? `<span style="font-size:0.7rem;color:var(--text-muted);">📝 ${escapeHtml(task.notes)}</span>` : ''}
+                                    <span class="task-actions">
+                                        <button data-edit-task="${slot.id}|${task.id}" title="Edit">✏️</button>
+                                        <button data-delete-task="${slot.id}|${task.id}" title="Delete">✕</button>
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="add-task-form">
+                            <input type="text" placeholder="Add a task..." data-add-task-input="${slot.id}" />
+                            <button class="btn btn-sm btn-success" data-add-task-btn="${slot.id}">➕ Add</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // ----- Event listeners -----
+            container.querySelectorAll('[data-delete-slot]').forEach(el => {
+                el.addEventListener('click', () => deleteSlot(el.dataset.deleteSlot));
+            });
+            container.querySelectorAll('[data-edit-slot]').forEach(el => {
+                el.addEventListener('click', () => openEditModal(el.dataset.editSlot));
+            });
+            container.querySelectorAll('[data-toggle-task]').forEach(el => {
+                el.addEventListener('change', () => {
+                    const [sid, tid] = el.dataset.toggleTask.split('|');
+                    toggleTask(sid, tid);
+                });
+            });
+            container.querySelectorAll('[data-delete-task]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const [sid, tid] = el.dataset.deleteTask.split('|');
+                    deleteTask(sid, tid);
+                });
+            });
+            container.querySelectorAll('[data-add-task-btn]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const sid = el.dataset.addTaskBtn;
+                    const input = container.querySelector(`[data-add-task-input="${sid}"]`);
+                    if (input && input.value.trim()) {
+                        addTask(sid, { name: input.value.trim() });
+                        input.value = '';
+                    }
+                });
+            });
+            container.querySelectorAll('[data-add-task-input]').forEach(el => {
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        const sid = el.dataset.addTaskInput;
+                        const btn = container.querySelector(`[data-add-task-btn="${sid}"]`);
+                        if (btn) btn.click();
+                    }
+                });
+            });
+            container.querySelectorAll('[data-edit-task]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const [sid, tid] = el.dataset.editTask.split('|');
+                    const slot = STATE.slots.find(s => s.id === sid);
+                    if (!slot) return;
+                    const task = slot.tasks.find(t => t.id === tid);
+                    if (!task) return;
+                    const newName = prompt('Edit task name:', task.name);
+                    if (newName !== null && newName.trim()) {
+                        editTask(sid, tid, { name: newName.trim() });
+                    }
+                });
+            });
+        }
+
+        // ============================================================
+        // 9. MODAL
+        // ============================================================
+        function openCreateModal() {
+            DOM.modalTitle.textContent = '✏️ Create Study Slot';
+            DOM.createSlotBtn.textContent = '➕ Create Slot';
+            STATE.editingSlotId = null;
+            resetForm();
+            DOM.modal.classList.add('active');
+            DOM.slotName.focus();
+        }
+
+        function openEditModal(slotId) {
+            const slot = STATE.slots.find(s => s.id === slotId);
+            if (!slot) return;
+            DOM.modalTitle.textContent = '✏️ Edit Study Slot';
+            DOM.createSlotBtn.textContent = '🔄 Update Slot';
+            STATE.editingSlotId = slotId;
+            DOM.slotName.value = slot.name;
+            DOM.slotStart.value = slot.startTime;
+            DOM.slotEnd.value = slot.endTime;
+            DOM.slotProductivity.value = slot.productivity || 'medium';
+            DOM.slotSubject.value = slot.subject || 'General';
+            if (slot.subject && !['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Coding', 'English', 'Custom'].includes(
+                    slot.subject)) {
+                DOM.slotSubject.value = 'Custom';
+                DOM.slotCustomSubject.value = slot.subject;
+            } else {
+                DOM.slotCustomSubject.value = '';
+            }
+            DOM.slotNotes.value = slot.notes || '';
+            DOM.modal.classList.add('active');
+            DOM.slotName.focus();
+        }
+
+        function closeModal() {
+            DOM.modal.classList.remove('active');
+            STATE.editingSlotId = null;
+            resetForm();
+        }
+
+        function resetForm() {
+            DOM.slotName.value = '';
+            DOM.slotStart.value = '08:00';
+            DOM.slotEnd.value = '10:00';
+            DOM.slotProductivity.value = 'medium';
+            DOM.slotSubject.value = 'Mathematics';
+            DOM.slotCustomSubject.value = '';
+            DOM.slotNotes.value = '';
+        }
+
+        function handleModalSubmit() {
+            const name = DOM.slotName.value.trim() || 'Untitled Slot';
+            const startTime = DOM.slotStart.value || '08:00';
+            const endTime = DOM.slotEnd.value || '10:00';
+            const productivity = DOM.slotProductivity.value;
+            let subject = DOM.slotSubject.value;
+            if (subject === 'Custom') {
+                subject = DOM.slotCustomSubject.value.trim() || 'Custom Subject';
+            }
+            const notes = DOM.slotNotes.value.trim();
+
+            if (timeToMinutes(startTime) >= timeToMinutes(endTime)) {
+                showNotification('⚠️ Invalid Time', 'Start time must be before end time.', '⏰');
+                return;
+            }
+
+            if (STATE.editingSlotId) {
+                editSlot(STATE.editingSlotId, { name, startTime, endTime, productivity, subject, notes });
+            } else {
+                createSlot({ name, startTime, endTime, productivity, subject, notes, date: getToday(), tasks: [] });
+            }
+        }
+
+        // ============================================================
+        // 10. THEME
+        // ============================================================
+        function toggleTheme() {
+            const next = STATE.theme === 'light' ? 'dark' : 'light';
+            STATE.theme = next;
+            applyTheme(next);
+            saveData();
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            DOM.themeToggle.textContent = theme === 'light' ? '🌙' : '☀️';
+        }
+
+        // ============================================================
+        // 11. LOCAL STORAGE
+        // ============================================================
+        function saveData() {
+            const data = {
+                slots: STATE.slots,
+                theme: STATE.theme,
+                version: '1.0',
+            };
+            try {
+                localStorage.setItem('studyPlannerData', JSON.stringify(data));
+                showSaveIndicator('Saved');
+            } catch (e) { console.warn('Save failed:', e); }
+        }
+
+        function loadData() {
+            try {
+                const raw = localStorage.getItem('studyPlannerData');
+                if (!raw) return false;
+                const data = JSON.parse(raw);
+                STATE.slots = data.slots || [];
+                STATE.theme = data.theme || 'light';
+                return true;
+            } catch (e) { console.warn('Load failed:', e); return false; }
+        }
+
+        let saveTimeout = null;
+
+        function showSaveIndicator(status = 'Saved') {
+            const el = DOM.saveIndicator;
+            const text = DOM.saveText;
+            el.classList.add('saving');
+            text.textContent = status;
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                el.classList.remove('saving');
+                text.textContent = 'All saved';
+            }, 1200);
+        }
+
+        // ============================================================
+        // 12. EXPORT / IMPORT
+        // ============================================================
+        function exportData() {
+            const data = {
+                slots: STATE.slots,
+                theme: STATE.theme,
+                version: '1.0',
+                exportedAt: new Date().toISOString(),
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `study-planner-${getToday()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('📤 Export Complete', 'Your data has been exported.', '📤');
+        }
+
+        function importData(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!data.slots || !Array.isArray(data.slots)) throw new Error('Invalid data format');
+                    if (!confirm('This will replace all current data. Continue?')) return;
+                    STATE.slots = data.slots;
+                    STATE.theme = data.theme || 'light';
+                    applyTheme(STATE.theme);
+                    saveData();
+                    renderAll();
+                    showNotification('📥 Import Complete', 'Data imported successfully!', '📥');
+                } catch (err) {
+                    showNotification('❌ Import Failed', 'Invalid file format.', '❌');
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ============================================================
+        // 13. PARTICLES
+        // ============================================================
+        function initParticles() {
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            let w, h;
+            const particles = [];
+            const COUNT = 50;
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            class Particle {
+                constructor() { this.reset(); }
+                reset() {
+                    this.x = Math.random() * w;
+                    this.y = Math.random() * h;
+                    this.r = 1.5 + Math.random() * 2.5;
+                    this.dx = (Math.random() - 0.5) * 0.3;
+                    this.dy = (Math.random() - 0.5) * 0.3;
+                    this.opacity = 0.2 + Math.random() * 0.4;
+                }
+                update() {
+                    this.x += this.dx;
+                    this.y += this.dy;
+                    if (this.x < 0 || this.x > w) this.dx *= -1;
+                    if (this.y < 0 || this.y > h) this.dy *= -1;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(108,92,231,${this.opacity * 0.5})`;
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+
+            function animate() {
+                ctx.clearRect(0, 0, w, h);
+                particles.forEach(p => { p.update();
+                    p.draw(); });
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 140) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(108,92,231,${0.05 * (1 - dist/140)})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // ============================================================
+        // 14. RENDER ALL
+        // ============================================================
+        function renderAll() {
+            updateDashboard();
+            renderTimeline();
+        }
+
+        // ============================================================
+        // 15. FILTER HANDLING
+        // ============================================================
+        function setupFilters() {
+            const filterInputs = [DOM.filterSearch, DOM.filterSubject, DOM.filterProductivity, DOM.filterStatus];
+            filterInputs.forEach(el => {
+                el.addEventListener('change', renderTimeline);
+                el.addEventListener('input', debounce(renderTimeline, 200));
+            });
+            DOM.filterClear.addEventListener('click', () => {
+                DOM.filterSearch.value = '';
+                DOM.filterSubject.value = 'all';
+                DOM.filterProductivity.value = 'all';
+                DOM.filterStatus.value = 'all';
+                renderTimeline();
+            });
+        }
+
+        // ============================================================
+        // 16. UPCOMING SLOT NOTIFICATIONS
+        // ============================================================
+        let notifiedSlots = new Set();
+
+        function checkUpcomingSlots() {
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const today = getToday();
+            STATE.slots.forEach(slot => {
+                if (slot.date !== today) return;
+                const start = timeToMinutes(slot.startTime);
+                const diff = start - currentMinutes;
+                if (diff > 0 && diff <= 10 && !notifiedSlots.has(slot.id)) {
+                    notifiedSlots.add(slot.id);
+                    showNotification('⏰ Slot Starting Soon', `${slot.name} begins at ${slot.startTime}`, '⏰');
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification('⏰ Study Slot Starting', {
+                            body: `${slot.name} at ${slot.startTime}`,
+                            icon: '📚',
+                        });
+                    }
+                }
+                if (diff > 10) notifiedSlots.delete(slot.id);
+            });
+        }
+
+        // ============================================================
+        // 17. KEYBOARD SHORTCUTS
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                openCreateModal();
+            }
+            if (e.key === 'Escape' && DOM.modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // ============================================================
+        // 18. INIT
+        // ============================================================
+        function init() {
+            loadData();
+            applyTheme(STATE.theme);
+            requestNotificationPermission();
+            initParticles();
+
+            // Modal events
+            DOM.fabCreate.addEventListener('click', openCreateModal);
+            DOM.modalClose.addEventListener('click', closeModal);
+            DOM.modal.addEventListener('click', (e) => {
+                if (e.target === DOM.modal) closeModal();
+            });
+            DOM.createSlotBtn.addEventListener('click', handleModalSubmit);
+            DOM.clearFormBtn.addEventListener('click', resetForm);
+
+            // Theme
+            DOM.themeToggle.addEventListener('click', toggleTheme);
+
+            // Export / Import
+            DOM.exportJsonBtn.addEventListener('click', exportData);
+            DOM.importJsonBtn.addEventListener('click', () => DOM.importFileInput.click());
+            DOM.importFileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    importData(e.target.files[0]);
+                    e.target.value = '';
+                }
+            });
+
+            // Filters
+            setupFilters();
+
+            renderAll();
+
+            // Check for upcoming slots every 30s
+            setInterval(checkUpcomingSlots, 30000);
+
+            console.log('📚 Study Slot Planner initialized.');
+            console.log(`📊 ${STATE.slots.length} slots loaded.`);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        // ============================================================
+        // 19. EXPLANATION
+        // ============================================================
+        console.log(`
+        ============================================================
+        📚 STUDY SLOT PLANNER — Core Architecture
+        ============================================================
+
+        🔹 HOW THE PLANNER WORKS
+        A single-page tool for scheduling study slots with tasks,
+        productivity levels, and subjects. All data is stored in
+        localStorage and auto-saved.
+
+        🔹 HOW SLOTS ARE MANAGED
+        Slots: id, name, date, startTime, endTime, productivity,
+        subject, notes, tasks[]. CRUD: createSlot(), editSlot(),
+        deleteSlot(). Slots render chronologically in the timeline.
+
+        🔹 HOW THE CURRENT SLOT IS DETECTED
+        getCurrentSlot() compares current time against start/end
+        times for today's slots. The active slot gets a "Now" badge.
+
+        🔹 HOW PROGRESS IS CALCULATED
+        Each slot: progress = completed tasks / total tasks * 100.
+        Dashboard shows today's slots, completed/remaining tasks,
+        total study time (from slot durations), and focus score.
+
+        🔹 HOW LOCALSTORAGE IS IMPLEMENTED
+        saveData() serializes STATE to JSON under the key
+        'studyPlannerData'. loadData() restores it on page load.
+        Auto-save triggers after every mutation.
+
+        🔹 HOW TO EXTEND WITH CLOUD SYNC & USER ACCOUNTS
+        1. Add a backend API (Node.js / Firebase / Supabase).
+        2. Replace localStorage calls with fetch() to your API.
+        3. Implement user authentication (JWT, OAuth).
+        4. Add a "Sync" button and conflict resolution.
+        5. Store user ID in STATE and scope queries to that user.
+
+        ============================================================
+        `);
+
+        window.__planner = { STATE, createSlot, deleteSlot, addTask, toggleTask, saveData, loadData, renderAll };
+    </script>
+
+</body>
+</html>
