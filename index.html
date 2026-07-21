@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>📚 Slotex</title>
+    <title>📚 Slotex </title>
 
     <style>
         /* ============================================================
@@ -239,15 +239,6 @@
             color: var(--low-prod);
         }
 
-        .badge-subject {
-            padding: 2px 12px;
-            border-radius: 100px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: #fff;
-            letter-spacing: 0.02em;
-        }
-
         .badge-now {
             background: rgba(0, 184, 148, 0.20);
             color: var(--high-prod);
@@ -435,7 +426,7 @@
         }
 
         /* ============================================================
-           FILTER & SEARCH
+           FILTER BAR
            ============================================================ */
         .filter-bar {
             display: flex;
@@ -466,7 +457,6 @@
             letter-spacing: 0.04em;
         }
 
-        .filter-bar input,
         .filter-bar select {
             padding: 6px 12px;
             border: 1px solid var(--border-glass);
@@ -480,7 +470,6 @@
             min-width: 100px;
         }
 
-        .filter-bar input:focus,
         .filter-bar select:focus {
             border-color: var(--accent-1);
             box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.10);
@@ -1045,7 +1034,6 @@
             .filter-bar .filter-group {
                 flex-wrap: wrap;
             }
-            .filter-bar input,
             .filter-bar select {
                 min-width: 80px;
                 flex: 1;
@@ -1151,22 +1139,6 @@
                         <option value="low">🔴 Low Productivity</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="slotSubject">Subject</label>
-                    <select id="slotSubject">
-                        <option value="Mathematics">Mathematics</option>
-                        <option value="Physics">Physics</option>
-                        <option value="Chemistry">Chemistry</option>
-                        <option value="Biology">Biology</option>
-                        <option value="Coding">Coding</option>
-                        <option value="English">English</option>
-                        <option value="Custom">✨ Custom Subject</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="slotCustomSubject">Custom Subject</label>
-                    <input type="text" id="slotCustomSubject" placeholder="e.g. History" />
-                </div>
                 <div class="form-group" style="grid-column:1/-1;">
                     <label for="slotNotes">Notes <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
                     <textarea id="slotNotes" placeholder="Any notes for this slot..." rows="2"></textarea>
@@ -1197,7 +1169,7 @@
         <header class="app-header" role="banner">
             <div class="brand">
                 <div>
-                    <h1>📚 Study Slot Planner</h1>
+                    <h1>📚 Slotex</h1>
                     <div class="subtitle">Plan your day according to your focus.</div>
                 </div>
             </div>
@@ -1220,22 +1192,6 @@
 
         <!-- ===== FILTER BAR ===== -->
         <div class="filter-bar" id="filterBar">
-            <div class="filter-group">
-                <label for="filterSearch">🔍</label>
-                <input type="text" id="filterSearch" placeholder="Search slots..." />
-            </div>
-            <div class="filter-group">
-                <label for="filterSubject">Subject</label>
-                <select id="filterSubject">
-                    <option value="all">All</option>
-                    <option value="Mathematics">Mathematics</option>
-                    <option value="Physics">Physics</option>
-                    <option value="Chemistry">Chemistry</option>
-                    <option value="Biology">Biology</option>
-                    <option value="Coding">Coding</option>
-                    <option value="English">English</option>
-                </select>
-            </div>
             <div class="filter-group">
                 <label for="filterProductivity">Focus</label>
                 <select id="filterProductivity">
@@ -1272,8 +1228,8 @@
     ============================================================ -->
     <script>
         /* ============================================================
-           SCRIPT.JS — Study Slot Planner (Core)
-           No streaks, achievements, calendar, statistics, or timers.
+           SCRIPT.JS — Slotex (Study Slot Planner)
+           No subjects, no search — just slots, tasks, and focus.
            ============================================================ */
 
         'use strict';
@@ -1299,8 +1255,6 @@
             slotStart: $('#slotStart'),
             slotEnd: $('#slotEnd'),
             slotProductivity: $('#slotProductivity'),
-            slotSubject: $('#slotSubject'),
-            slotCustomSubject: $('#slotCustomSubject'),
             slotNotes: $('#slotNotes'),
             createSlotBtn: $('#createSlotBtn'),
             clearFormBtn: $('#clearFormBtn'),
@@ -1316,8 +1270,6 @@
             modalClose: $('#modal-close'),
             modalTitle: $('#modal-title'),
             slotCount: $('#slot-count'),
-            filterSearch: $('#filterSearch'),
-            filterSubject: $('#filterSubject'),
             filterProductivity: $('#filterProductivity'),
             filterStatus: $('#filterStatus'),
             filterClear: $('#filterClear'),
@@ -1337,18 +1289,6 @@
         function timeToMinutes(t) { const [h, m] = t.split(':').map(Number); return h * 60 + m; }
 
         function getToday() { return new Date().toISOString().slice(0, 10); }
-
-        function getSubjectColor(subject) {
-            const map = {
-                'Mathematics': '#6c5ce7',
-                'Physics': '#0984e3',
-                'Chemistry': '#00b894',
-                'Biology': '#00cec9',
-                'Coding': '#fd79a8',
-                'English': '#fdcb6e',
-            };
-            return map[subject] || '#8b8bae';
-        }
 
         function getProductivityLabel(val) {
             return val === 'high' ? '🟢 High' : val === 'medium' ? '🟡 Medium' : '🔴 Low';
@@ -1383,18 +1323,10 @@
         }
 
         function getFilteredSlots() {
-            const search = DOM.filterSearch.value.toLowerCase().trim();
-            const subject = DOM.filterSubject.value;
             const productivity = DOM.filterProductivity.value;
             const status = DOM.filterStatus.value;
 
             return STATE.slots.filter(slot => {
-                // Search
-                if (search && !slot.name.toLowerCase().includes(search) && !slot.subject.toLowerCase().includes(search)) {
-                    return false;
-                }
-                // Subject
-                if (subject !== 'all' && slot.subject !== subject) return false;
                 // Productivity
                 if (productivity !== 'all' && slot.productivity !== productivity) return false;
                 // Status
@@ -1453,7 +1385,6 @@
                 startTime: data.startTime || '08:00',
                 endTime: data.endTime || '10:00',
                 productivity: data.productivity || 'medium',
-                subject: data.subject || 'General',
                 notes: data.notes || '',
                 tasks: data.tasks || [],
                 createdAt: new Date().toISOString(),
@@ -1531,7 +1462,7 @@
         }
 
         // ============================================================
-        // 6. STATISTICS (simple calculations)
+        // 6. STATISTICS
         // ============================================================
         function calculateStats() {
             const slots = STATE.slots;
@@ -1584,7 +1515,7 @@
                     <div class="empty-state">
                         <div class="empty-icon">${hasSlots ? '🔍' : '📋'}</div>
                         <h3>${hasSlots ? 'No slots match your filters' : 'No slots yet'}</h3>
-                        <p>${hasSlots ? 'Try adjusting your search or filters.' : 'Click the ＋ button to create your first study slot.'}</p>
+                        <p>${hasSlots ? 'Try adjusting your filters.' : 'Click the ＋ button to create your first study slot.'}</p>
                     </div>
                 `;
                 return;
@@ -1602,7 +1533,6 @@
                 const tasks = slot.tasks || [];
                 const completedTasks = tasks.filter(t => t.completed).length;
                 const progress = tasks.length ? Math.round((completedTasks / tasks.length) * 100) : 0;
-                const subjectColor = getSubjectColor(slot.subject);
                 const prodLabel = getProductivityLabel(slot.productivity);
                 const prodBadge = getProductivityBadge(slot.productivity);
 
@@ -1612,7 +1542,6 @@
                             <div class="slot-title">
                                 <span>${escapeHtml(slot.name)}</span>
                                 <span class="badge ${prodBadge}">${prodLabel}</span>
-                                <span class="badge-subject" style="background:${subjectColor};">${escapeHtml(slot.subject)}</span>
                                 ${isActive ? '<span class="badge badge-now">▶ Now</span>' : ''}
                             </div>
                             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -1730,14 +1659,6 @@
             DOM.slotStart.value = slot.startTime;
             DOM.slotEnd.value = slot.endTime;
             DOM.slotProductivity.value = slot.productivity || 'medium';
-            DOM.slotSubject.value = slot.subject || 'General';
-            if (slot.subject && !['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Coding', 'English', 'Custom'].includes(
-                    slot.subject)) {
-                DOM.slotSubject.value = 'Custom';
-                DOM.slotCustomSubject.value = slot.subject;
-            } else {
-                DOM.slotCustomSubject.value = '';
-            }
             DOM.slotNotes.value = slot.notes || '';
             DOM.modal.classList.add('active');
             DOM.slotName.focus();
@@ -1754,8 +1675,6 @@
             DOM.slotStart.value = '08:00';
             DOM.slotEnd.value = '10:00';
             DOM.slotProductivity.value = 'medium';
-            DOM.slotSubject.value = 'Mathematics';
-            DOM.slotCustomSubject.value = '';
             DOM.slotNotes.value = '';
         }
 
@@ -1764,10 +1683,6 @@
             const startTime = DOM.slotStart.value || '08:00';
             const endTime = DOM.slotEnd.value || '10:00';
             const productivity = DOM.slotProductivity.value;
-            let subject = DOM.slotSubject.value;
-            if (subject === 'Custom') {
-                subject = DOM.slotCustomSubject.value.trim() || 'Custom Subject';
-            }
             const notes = DOM.slotNotes.value.trim();
 
             if (timeToMinutes(startTime) >= timeToMinutes(endTime)) {
@@ -1776,9 +1691,9 @@
             }
 
             if (STATE.editingSlotId) {
-                editSlot(STATE.editingSlotId, { name, startTime, endTime, productivity, subject, notes });
+                editSlot(STATE.editingSlotId, { name, startTime, endTime, productivity, notes });
             } else {
-                createSlot({ name, startTime, endTime, productivity, subject, notes, date: getToday(), tasks: [] });
+                createSlot({ name, startTime, endTime, productivity, notes, date: getToday(), tasks: [] });
             }
         }
 
@@ -1851,7 +1766,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `study-planner-${getToday()}.json`;
+            a.download = `slotex-${getToday()}.json`;
             a.click();
             URL.revokeObjectURL(url);
             showNotification('📤 Export Complete', 'Your data has been exported.', '📤');
@@ -1957,14 +1872,11 @@
         // 15. FILTER HANDLING
         // ============================================================
         function setupFilters() {
-            const filterInputs = [DOM.filterSearch, DOM.filterSubject, DOM.filterProductivity, DOM.filterStatus];
+            const filterInputs = [DOM.filterProductivity, DOM.filterStatus];
             filterInputs.forEach(el => {
                 el.addEventListener('change', renderTimeline);
-                el.addEventListener('input', debounce(renderTimeline, 200));
             });
             DOM.filterClear.addEventListener('click', () => {
-                DOM.filterSearch.value = '';
-                DOM.filterSubject.value = 'all';
                 DOM.filterProductivity.value = 'all';
                 DOM.filterStatus.value = 'all';
                 renderTimeline();
@@ -2050,7 +1962,7 @@
             // Check for upcoming slots every 30s
             setInterval(checkUpcomingSlots, 30000);
 
-            console.log('📚 Study Slot Planner initialized.');
+            console.log('📚 Slotex initialized.');
             console.log(`📊 ${STATE.slots.length} slots loaded.`);
         }
 
@@ -2065,18 +1977,18 @@
         // ============================================================
         console.log(`
         ============================================================
-        📚 STUDY SLOT PLANNER — Core Architecture
+        📚 SLOTEX — Study Slot Planner
         ============================================================
 
         🔹 HOW THE PLANNER WORKS
-        A single-page tool for scheduling study slots with tasks,
-        productivity levels, and subjects. All data is stored in
-        localStorage and auto-saved.
+        A single-page tool for scheduling study slots with tasks
+        and productivity levels. All data is stored in localStorage
+        and auto-saved.
 
         🔹 HOW SLOTS ARE MANAGED
         Slots: id, name, date, startTime, endTime, productivity,
-        subject, notes, tasks[]. CRUD: createSlot(), editSlot(),
-        deleteSlot(). Slots render chronologically in the timeline.
+        notes, tasks[]. CRUD: createSlot(), editSlot(), deleteSlot().
+        Slots render chronologically in the timeline.
 
         🔹 HOW THE CURRENT SLOT IS DETECTED
         getCurrentSlot() compares current time against start/end
