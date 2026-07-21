@@ -10,7 +10,6 @@
 - **Manage Tasks** – Inside each slot, add unlimited tasks. Mark them complete, edit names, or delete them. Progress bars update automatically.
 - **Dashboard** – At a glance, see today's slots, completed/remaining tasks, total study time, and focus score.
 - **Current Slot Highlight** – The timeline automatically highlights the slot that matches the current time with a "Now" badge.
-- **Search & Filter** – Filter slots by subject, productivity level, or completion status. Search by slot name.
 - **Dark / Light Theme** – Toggle between themes; your preference is saved.
 - **Export / Import** – Backup your entire planner as a JSON file, or restore it later.
 - **Auto‑Save** – All changes are saved to localStorage instantly. Close the app and come back — your data is still there.
