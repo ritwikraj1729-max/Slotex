@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Slotex </title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱️</text></svg>" />
 
     <style>
         /* ============================================================
@@ -599,12 +600,13 @@
             width: 0%;
         }
 
-        /* ----- Tasks ----- */
+        /* ----- Tasks (Drag & Drop) ----- */
         .task-list {
             margin-top: 12px;
             display: flex;
             flex-direction: column;
             gap: 5px;
+            min-height: 40px;
         }
 
         .task-item {
@@ -616,11 +618,22 @@
             border-radius: var(--radius-sm);
             transition: all var(--transition);
             border: 1px solid transparent;
+            cursor: grab;
+            user-select: none;
         }
 
         .task-item:hover {
             border-color: var(--border-glass);
             background: var(--bg-glass-strong);
+        }
+
+        .task-item:active {
+            cursor: grabbing;
+        }
+
+        .task-item.dragging {
+            opacity: 0.4;
+            border: 1px dashed var(--accent-1);
         }
 
         .task-item.completed .task-name {
@@ -645,6 +658,7 @@
         .task-item .task-name {
             flex: 1;
             font-size: 0.85rem;
+            pointer-events: none;
         }
 
         .task-item .task-priority {
@@ -659,6 +673,7 @@
         .task-item .task-actions {
             display: flex;
             gap: 2px;
+            pointer-events: none;
         }
 
         .task-item .task-actions button {
@@ -670,10 +685,19 @@
             font-size: 0.75rem;
             color: var(--text-muted);
             transition: all var(--transition);
+            pointer-events: auto;
         }
         .task-item .task-actions button:hover {
             background: var(--bg-secondary);
             color: var(--text-primary);
+        }
+
+        /* Drag-over state for slots */
+        .timeline-item.drag-over {
+            border: 2px dashed var(--accent-1);
+            background: var(--bg-glass-strong);
+            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.08);
+            transform: scale(1.01);
         }
 
         .add-task-form {
@@ -1230,6 +1254,7 @@
         /* ============================================================
            SCRIPT.JS — Slotex (Study Slot Planner)
            No subjects, no search — just slots, tasks, and focus.
+           Drag & Drop tasks between slots.
            ============================================================ */
 
         'use strict';
@@ -1327,9 +1352,7 @@
             const status = DOM.filterStatus.value;
 
             return STATE.slots.filter(slot => {
-                // Productivity
                 if (productivity !== 'all' && slot.productivity !== productivity) return false;
-                // Status
                 if (status === 'completed') {
                     const tasks = slot.tasks || [];
                     if (tasks.length === 0) return false;
@@ -1537,7 +1560,7 @@
                 const prodBadge = getProductivityBadge(slot.productivity);
 
                 return `
-                    <div class="timeline-item ${isActive ? 'active-slot' : ''}" data-slot-id="${slot.id}">
+                    <div class="timeline-item ${isActive ? 'active-slot' : ''}" data-slot-id="${slot.id}" data-drop-target="true">
                         <div class="slot-header">
                             <div class="slot-title">
                                 <span>${escapeHtml(slot.name)}</span>
@@ -1563,7 +1586,10 @@
 
                         <div class="task-list" data-slot-tasks="${slot.id}">
                             ${tasks.map(task => `
-                                <div class="task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
+                                <div class="task-item ${task.completed ? 'completed' : ''}" 
+                                     draggable="true" 
+                                     data-task-id="${task.id}" 
+                                     data-slot-id="${slot.id}">
                                     <input type="checkbox" class="task-check" ${task.completed ? 'checked' : ''} data-toggle-task="${slot.id}|${task.id}" />
                                     <span class="task-name">${escapeHtml(task.name)}</span>
                                     <span class="task-priority">${task.priority || 'medium'}</span>
@@ -1584,7 +1610,8 @@
                 `;
             }).join('');
 
-            // ----- Event listeners -----
+            // ----- Event Listeners -----
+            // 1. Standard CRUD listeners
             container.querySelectorAll('[data-delete-slot]').forEach(el => {
                 el.addEventListener('click', () => deleteSlot(el.dataset.deleteSlot));
             });
@@ -1634,6 +1661,67 @@
                         editTask(sid, tid, { name: newName.trim() });
                     }
                 });
+            });
+
+            // 2. Drag & Drop listeners (Event Delegation)
+            container.addEventListener('dragstart', (e) => {
+                const taskItem = e.target.closest('.task-item');
+                if (!taskItem) return;
+                const slotId = taskItem.dataset.slotId;
+                const taskId = taskItem.dataset.taskId;
+                e.dataTransfer.setData('text/plain', JSON.stringify({ slotId, taskId }));
+                e.dataTransfer.effectAllowed = 'move';
+                taskItem.classList.add('dragging');
+            });
+
+            container.addEventListener('dragend', (e) => {
+                // Clean up drag styles
+                document.querySelectorAll('.task-item.dragging').forEach(el => el.classList.remove('dragging'));
+                document.querySelectorAll('.timeline-item.drag-over').forEach(el => el.classList.remove('drag-over'));
+            });
+
+            container.addEventListener('dragover', (e) => {
+                const targetSlot = e.target.closest('.timeline-item');
+                if (!targetSlot) return;
+                e.preventDefault(); // Required for drop
+                e.dataTransfer.dropEffect = 'move';
+                targetSlot.classList.add('drag-over');
+            });
+
+            container.addEventListener('dragleave', (e) => {
+                const targetSlot = e.target.closest('.timeline-item');
+                if (!targetSlot) return;
+                targetSlot.classList.remove('drag-over');
+            });
+
+            container.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const targetSlot = e.target.closest('.timeline-item');
+                if (!targetSlot) return;
+                targetSlot.classList.remove('drag-over');
+
+                const rawData = e.dataTransfer.getData('text/plain');
+                if (!rawData) return;
+                const { slotId: sourceSlotId, taskId } = JSON.parse(rawData);
+                const targetSlotId = targetSlot.dataset.slotId;
+
+                if (sourceSlotId === targetSlotId) return; // No change
+
+                const sourceSlot = STATE.slots.find(s => s.id === sourceSlotId);
+                const targetSlotObj = STATE.slots.find(s => s.id === targetSlotId);
+                if (!sourceSlot || !targetSlotObj) return;
+
+                const taskIndex = sourceSlot.tasks.findIndex(t => t.id === taskId);
+                if (taskIndex === -1) return;
+
+                // Move the task
+                const [movedTask] = sourceSlot.tasks.splice(taskIndex, 1);
+                targetSlotObj.tasks.push(movedTask);
+
+                // Save and re-render
+                saveData();
+                renderAll();
+                showNotification('📦 Task Moved', `Task moved to "${targetSlotObj.name}"`, '📦');
             });
         }
 
